@@ -178,4 +178,4 @@ for(loc in unique(dat_germany_weekly$location)){
 }
 
 # write out results as csv:
-write.csv(all_forecasts, file = paste0("forecasts/", forecast_date, "-KIT-baseline-ICU.csv"), row.names = FALSE)
+write.csv(all_forecasts, file = paste0("forecasts/", forecast_date, "-Germany-KIT-baseline-ICU.csv"), row.names = FALSE)
