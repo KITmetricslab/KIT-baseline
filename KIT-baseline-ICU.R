@@ -9,10 +9,10 @@ Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF8")
 path_hub <- "/home/johannes/Documents/COVID/covid19-forecast-hub-de"
 
 # read in data on ICU and ventilation use:
-dat_germany_ICU <- read.csv(paste0(path_hub, "/data-truth/DIVI/bundeslaender/truth_DIVI-cases_covid_current_Germany.csv"),
+dat_germany_ICU <- read.csv(paste0(path_hub, "/data-truth/DIVI/truth_DIVI-Current ICU_Germany.csv"),
                             colClasses = c(date = "Date"), stringsAsFactors = FALSE)
 
-dat_germany_vent <- read.csv(paste0(path_hub, "/data-truth/DIVI/bundeslaender/truth_DIVI-cases_covid_current_ventilated_Germany.csv"),
+dat_germany_vent <- read.csv(paste0(path_hub, "/data-truth/DIVI/truth_DIVI-Current Ventilated_Germany.csv"),
                             colClasses = c(date = "Date"), stringsAsFactors = FALSE)
 
 # handle weekdays and epidemic weeks:
