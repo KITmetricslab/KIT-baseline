@@ -6,7 +6,7 @@ Sys.setlocale("LC_ALL", "en_US.utf8") # Linux
 # Sys.setlocale("LC_ALL","English") # Windows
 
 # select forecast_date for which to generate forecasts
-forecast_date <- as.Date("2020-08-03")
+forecast_date <- as.Date("2020-07-06")
 last_obs_week <- MMWRweek::MMWRweek(forecast_date)$MMWRweek - 1
 
 # Define which quantiles are to be stored:
