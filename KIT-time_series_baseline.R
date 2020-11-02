@@ -3,12 +3,13 @@
 library(forecast)
 
 setwd("/home/johannes/Documents/COVID/KIT-baseline")
+source("functions.R") # read in helper functions
 source("functions_es.R") # read in helper functions
 Sys.setlocale("LC_ALL", "en_US.utf8") # Linux
 # Sys.setlocale("LC_ALL","English") # Windows
 
 # select forecast_date for which to generate forecasts
-forecast_date <- as.Date("2020-10-12")
+forecast_date <- as.Date("2020-10-26")
 last_obs_week <- MMWRweek::MMWRweek(forecast_date)$MMWRweek - 1
 loc <- "GM"
 location_name = "Germany"
@@ -33,6 +34,7 @@ if(max(dat_truth$date) < forecast_date - 1) warning("Please update the covid19-f
 # extract locations:
 locations_gm <- read.csv(paste0(path_hub, "/template/state_codes_germany.csv"), stringsAsFactors = FALSE)
 locations_pl <- read.csv(paste0(path_hub, "/template/state_codes_poland.csv"), stringsAsFactors = FALSE)
+locations_pl$state_name <- unaccent(state_name) # remove special characters.
 
 # run for Germany, cases:
 cases_gm <- NULL

@@ -1,3 +1,11 @@
+# helper function: remove accents
+unaccent <- function(text) {
+  text <- gsub("['`^~\"]", " ", text)
+  text <- iconv(text, to="ASCII//TRANSLIT//IGNORE")
+  text <- gsub("['`^~\"]", "", text)
+  return(text)
+}
+
 # helper function to estimate overdispersino parameter:
 fit_psi <- function(vect){
   mu <- pmax(head(vect, length(vect) - 1), 0.2)
