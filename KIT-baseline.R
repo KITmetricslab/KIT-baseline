@@ -1,30 +1,31 @@
-# Simple baseline forecast for COVID19 death numbers in Germany
+# Simple baseline forecast for COVID19 death numbers in Germany and Poland
 
-setwd("/home/johannes/Documents/COVID/KIT-baseline")
+# setwd("/home/johannes/Documents/Projects/KIT-baseline")
+library(here)
 source("functions.R") # read in helper functions
 Sys.setlocale("LC_ALL", "en_US.utf8") # Linux
 # Sys.setlocale("LC_ALL","English") # Windows
 
 # select forecast_date for which to generate forecasts
-forecast_date <- as.Date("2020-08-03")
+forecast_date <- as.Date("2021-01-11")
 last_obs_week <- MMWRweek::MMWRweek(forecast_date)$MMWRweek - 1
 
 # Define which quantiles are to be stored:
 q <- c(0.01, 0.025, 1:19/20, 0.975, 0.99)
 
 # path where the covid19-forecast-hub-de repository is stored
-path_hub <- "/home/johannes/Documents/COVID/covid19-forecast-hub-de"
+path_hub <- "../covid19-forecast-hub-de"
 
 # read in incident and cumulative death data:
 dat_inc <- read.csv(paste0(path_hub, "/data-truth/RKI/truth_RKI-Incident Deaths_Germany.csv"),
                             colClasses = c(date = "Date"), stringsAsFactors = FALSE)
-dat_inc_poland <- read.csv(paste0(path_hub, "/data-truth/ECDC/truth_ECDC-Incident Deaths_Poland.csv"),
+dat_inc_poland <- read.csv(paste0(path_hub, "/data-truth/MZ/truth_MZ-Incident Deaths_Poland.csv"),
                            colClasses = c(date = "Date"), stringsAsFactors = FALSE)
 dat_inc <- rbind(dat_inc, dat_inc_poland)
 
 dat_cum <- read.csv(paste0(path_hub, "/data-truth/RKI/truth_RKI-Cumulative Deaths_Germany.csv"),
                             colClasses = c(date = "Date"), stringsAsFactors = FALSE)
-dat_cum_poland <- read.csv(paste0(path_hub, "/data-truth/ECDC/truth_ECDC-Cumulative Deaths_Poland.csv"),
+dat_cum_poland <- read.csv(paste0(path_hub, "/data-truth/MZ/truth_MZ-Cumulative Deaths_Poland.csv"),
                            colClasses = c(date = "Date"), stringsAsFactors = FALSE)
 dat_cum <- rbind(dat_cum, dat_cum_poland)
 
@@ -63,7 +64,8 @@ dat_weekly <- merge(dat_inc_weekly, dat_cum,
                             by.y = c("date", "location", "location_name"))
 colnames(dat_weekly)[colnames(dat_weekly) == "value"] <- "cum_death"
 
-tail(dat_weekly)
+
+# generate forecasts for Germany:
 
 all_forecasts <- NULL
 
@@ -91,8 +93,34 @@ if(!(all(weekdays(all_forecasts$target_end_date) == "Saturday"))){
   } else{
   # store:
   write.csv(all_forecasts, file = paste0("forecasts/", forecast_date, "-Germany-KIT-baseline.csv"), row.names = FALSE)
+  }
+
+# Generate forecasts for Poland:
+
+all_forecasts <- NULL
+
+# run through locations in Poland:
+locations_poland <- unique(dat_weekly$location)
+locations_poland <- locations_poland[grepl("PL", locations_poland)]
+
+for(loc in locations_poland){
+  cat("Starting", loc, "\n")
+  
+  # put everything together:
+  forecasts_location <- baseline_forecast(dat_weekly = dat_weekly, loc = loc,
+                                          target = "death", forecast_date = forecast_date)
+  
+  # and add to large table:
+  if(is.null(all_forecasts)){
+    all_forecasts <- forecasts_location
+  }else{
+    all_forecasts <- rbind(all_forecasts, forecasts_location)
+  }
 }
 
-# add forecast for Poland:
-forecasts_poland <- baseline_forecast(dat_weekly = dat_weekly, loc = "PL", target = "death", forecast_date = forecast_date)
-write.csv(forecasts_poland, file = paste0("forecasts/", forecast_date, "-Poland-KIT-baseline.csv"), row.names = FALSE)
+if(!(all(weekdays(all_forecasts$target_end_date) == "Saturday"))){
+  warning("target_end_days are not all Saturdays!")
+} else{
+  # store:
+  write.csv(all_forecasts, file = paste0("forecasts/", forecast_date, "-Poland-KIT-baseline.csv"), row.names = FALSE)
+}
